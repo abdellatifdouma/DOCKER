@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "NutriScan",
+    "slug": "nutriscan",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#1B5E20"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSCameraUsageDescription": "NutriScan utilise la caméra pour photographier vos repas et estimer leurs calories.",
+        "NSPhotoLibraryUsageDescription": "NutriScan accède à vos photos pour analyser vos repas.",
+        "NSMotionUsageDescription": "NutriScan utilise le capteur de mouvement pour compter vos pas et suivre votre effort physique."
+      }
+    },
+    "android": {
+      "package": "com.nutriscan.app",
+      "permissions": [
+        "CAMERA",
+        "ACTIVITY_RECOGNITION",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+    "plugins": [
+      "expo-image-picker",
+      "expo-notifications",
+      "expo-sensors"
+    ]
+  }
+}
