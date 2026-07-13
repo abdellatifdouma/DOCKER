@@ -252,6 +252,20 @@
   .eco .ro{font-size:.92rem;color:var(--ink-soft);margin-top:8px;}
   .eco .self{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--c);margin-top:16px;display:inline-block;}
 
+  /* showcase video */
+  .showcase{display:grid;grid-template-columns:1.35fr .8fr;gap:44px;align-items:center;}
+  .frame{background:var(--bg-2);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 40px 80px -40px var(--shadow);}
+  .frame .bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--bg);}
+  .frame .bar i{width:11px;height:11px;border-radius:50%;background:var(--line);display:block;}
+  .frame .bar .url{margin-left:14px;font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--bg-2);border:1px solid var(--line);border-radius:100px;padding:5px 14px;}
+  .frame video{display:block;width:100%;height:auto;background:#0b1020;}
+  .feat{display:flex;flex-direction:column;gap:15px;}
+  .feat .fi{display:flex;gap:13px;align-items:flex-start;}
+  .feat .fi .k{width:30px;height:30px;border-radius:9px;background:var(--card-soft);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:700;flex:none;}
+  .feat .fi b{font-size:1.02rem;} .feat .fi p{font-size:.9rem;margin:2px 0 0;}
+  .benefit{margin-top:6px;background:var(--navy);color:#fff;border-radius:18px;padding:20px 22px;}
+  .benefit b{color:#fff;font-size:1rem;} .benefit p{color:rgba(255,255,255,.82);font-size:.92rem;margin:7px 0 0;}
+
   /* big CTA */
   .cta{background:var(--navy);color:#fff;border-radius:40px;padding:clamp(48px,7vw,96px);
     text-align:center;position:relative;overflow:hidden;}
@@ -293,6 +307,7 @@
       </a>
       <div class="navlinks">
         <a href="#solutions">Solutions</a>
+        <a href="#demo">Démo</a>
         <a href="#agent">Agent IA</a>
         <a href="#humain">L'humain</a>
         <a href="#resultats">Résultats</a>
@@ -402,12 +417,41 @@
     </div>
   </section>
 
+  <!-- SHOWCASE VIDEO -->
+  <section class="sec" id="demo">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div>
+          <span class="count">(02) Une solution en action</span>
+          <h2 class="big" style="margin-top:14px">Vos opérations,<br>de A à Z.</h2>
+        </div>
+        <p>Exemple concret : notre plateforme de gestion du transport international. Un espace
+          client sécurisé où salariés et clients suivent chaque opération en temps réel.</p>
+      </div>
+      <div class="showcase">
+        <div class="frame reveal">
+          <div class="bar"><i></i><i></i><i></i><span class="url">app.erpium.ma — Espace client · login &amp; mot de passe</span></div>
+          <video src="/videos/transport-demo.mp4" poster="/videos/transport-poster.jpg" autoplay muted loop playsinline preload="metadata"></video>
+        </div>
+        <div class="feat reveal">
+          <div class="fi"><span class="k">01</span><div><b>Demande de cotation</b><p>Tarif maritime, aérien ou routier calculé automatiquement.</p></div></div>
+          <div class="fi"><span class="k">02</span><div><b>Check-list documents</b><p>Facture, B/L, certificat d'origine, assurance — dossier complet.</p></div></div>
+          <div class="fi"><span class="k">03</span><div><b>Tracking en temps réel</b><p>Chaque étape suivie, de l'enlèvement à la livraison.</p></div></div>
+          <div class="fi"><span class="k">04</span><div><b>Facturation &amp; notifications</b><p>Facture émise et client averti automatiquement par SMS/e-mail.</p></div></div>
+          <div class="benefit"><b>Simple pour vos équipes, transparent pour vos clients.</b>
+            <p>Un salarié peu expérimenté traite une opération pas à pas ; le client, lui, voit
+              l'information en temps réel dans son espace sécurisé.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- AGENT IA -->
   <section class="sec" id="agent">
     <div class="wrap">
       <div class="sec-head reveal">
         <div>
-          <span class="count">(02) Agent IA téléphonique</span>
+          <span class="count">(03) Agent IA téléphonique</span>
           <h2 class="big" style="margin-top:14px">Un standard qui<br>ne dort jamais.</h2>
         </div>
         <p>Il décroche à la première sonnerie, comprend aussi bien le français que le darija,
@@ -443,7 +487,7 @@
     <div class="wrap">
       <div class="sec-head reveal">
         <div>
-          <span class="count">(03) Notre ADN</span>
+          <span class="count">(04) Notre ADN</span>
           <h2 class="big" style="margin-top:14px">L'humain avant<br>la <span style="color:var(--green)">technologie</span>.</h2>
         </div>
         <p>Un projet commence toujours par une rencontre — et un interlocuteur qui reste le vôtre, du début à la fin.</p>
@@ -479,7 +523,7 @@
     <div class="wrap">
       <div class="sec-head reveal">
         <div>
-          <span class="count">(04) Résultats</span>
+          <span class="count">(05) Résultats</span>
           <h2 class="big" style="margin-top:14px">L'impact,<br>en chiffres.</h2>
         </div>
         <p>Un aperçu de l'impact typique de nos missions. Étude de cas détaillée sur demande.</p>
@@ -517,7 +561,7 @@
     <div class="wrap">
       <div class="sec-head reveal">
         <div>
-          <span class="count">(05) Groupe Arboris Management</span>
+          <span class="count">(06) Groupe Arboris Management</span>
           <h2 class="big" style="margin-top:14px">Un écosystème pour<br>faire <span style="color:var(--green)">grandir vos ambitions</span>.</h2>
         </div>
         <p>Erpium fait partie du groupe Arboris. Quatre filiales, un accompagnement global : image, ventes, talents et performance.</p>
