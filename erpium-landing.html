@@ -265,6 +265,14 @@
   .feat .fi b{font-size:1.02rem;} .feat .fi p{font-size:.9rem;margin:2px 0 0;}
   .benefit{margin-top:6px;background:var(--navy);color:#fff;border-radius:18px;padding:20px 22px;}
   .benefit b{color:#fff;font-size:1rem;} .benefit p{color:rgba(255,255,255,.82);font-size:.92rem;margin:7px 0 0;}
+  .demos-head{margin:44px 0 20px;font-size:1.15rem;font-weight:800;letter-spacing:-.02em;}
+  .demos-head span{color:var(--muted);font-weight:500;font-size:1rem;}
+  .demos{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .vcard{background:var(--bg-2);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:transform .25s,box-shadow .25s;}
+  .vcard:hover{transform:translateY(-5px);box-shadow:0 26px 54px -34px var(--shadow);}
+  .vcard video{display:block;width:100%;height:auto;background:#0b1020;}
+  .vcard .cap{padding:15px 17px;}
+  .vcard .cap b{font-size:1rem;} .vcard .cap p{font-size:.86rem;margin:3px 0 0;}
 
   /* big CTA */
   .cta{background:var(--navy);color:#fff;border-radius:40px;padding:clamp(48px,7vw,96px);
@@ -441,6 +449,21 @@
           <div class="benefit"><b>Simple pour vos équipes, transparent pour vos clients.</b>
             <p>Un salarié peu expérimenté traite une opération pas à pas ; le client, lui, voit
               l'information en temps réel dans son espace sécurisé.</p></div>
+        </div>
+      </div>
+      <div class="demos-head reveal">Et pour chacun de nos métiers. <span>— l'outil en action.</span></div>
+      <div class="demos">
+        <div class="vcard reveal">
+          <video src="/videos/demo-erp.mp4" poster="/videos/poster-erp.jpg" autoplay muted loop playsinline preload="auto"></video>
+          <div class="cap"><b>ERP &amp; gestion intégrée</b><p>Une seule saisie — toute la chaîne se met à jour.</p></div>
+        </div>
+        <div class="vcard reveal">
+          <video src="/videos/demo-agent.mp4" poster="/videos/poster-agent.jpg" autoplay muted loop playsinline preload="auto"></video>
+          <div class="cap"><b>Agent IA téléphonique</b><p>Il répond en français et en darija, et agit.</p></div>
+        </div>
+        <div class="vcard reveal">
+          <video src="/videos/demo-automatisation.mp4" poster="/videos/poster-automatisation.jpg" autoplay muted loop playsinline preload="auto"></video>
+          <div class="cap"><b>Automatisation</b><p>Du formulaire au devis, sans intervention.</p></div>
         </div>
       </div>
     </div>
