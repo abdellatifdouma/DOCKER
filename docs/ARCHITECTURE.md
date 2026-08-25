@@ -229,6 +229,154 @@ Pour l'**admin (vous)** :
 
 ---
 
+## 7 bis. Onboarding & validation manuelle (KYB par l'équipe Erpium)
+
+Un prospect **ne peut pas s'auto-activer**. L'accès à l'agent vocal est **conditionné à une validation
+manuelle** par l'équipe Erpium, qui vérifie que l'entreprise exerce réellement dans le secteur d'activité
+déclaré. C'est un contrôle **KYB (Know Your Business)** — porte d'entrée obligatoire du cycle de vie du compte.
+
+### Cycle de vie d'un compte (state machine)
+
+```mermaid
+stateDiagram-v2
+    [*] --> LEAD: Prospect remplit le formulaire
+    LEAD --> PENDING_REVIEW: Soumission complète
+    PENDING_REVIEW --> INFO_REQUESTED: Équipe Erpium demande un justificatif
+    INFO_REQUESTED --> PENDING_REVIEW: Prospect complète
+    PENDING_REVIEW --> APPROVED: Secteur vérifié ✔
+    PENDING_REVIEW --> REJECTED: Non conforme
+    APPROVED --> ONBOARDING: Création du tenant + config
+    ONBOARDING --> ACTIVE: Numéro attribué, agent en ligne
+    ACTIVE --> SUSPENDED: Abus / impayé / demande
+    SUSPENDED --> ACTIVE: Réactivation
+    REJECTED --> [*]
+    ACTIVE --> [*]: Résiliation
+```
+
+### Le formulaire prospect (données collectées)
+- **Identité entreprise** : raison sociale, **SIREN/SIRET**, code **APE/NAF**, adresse, pays.
+- **Secteur d'activité déclaré** (liste contrôlée) + description de l'usage prévu.
+- **Contact** : nom, email pro (vérifié par lien), téléphone.
+- **Justificatifs** : Kbis / extrait registre du commerce, site web, éventuel mandat.
+- **Volumétrie estimée** (appels/mois) et intégrations souhaitées.
+- **Consentements** : CGU, DPA/RGPD.
+
+### Vérifications (semi-automatisées, décision humaine)
+1. **Contrôles automatiques** en amont pour outiller le validateur (ne décident pas) :
+   - Vérification **SIREN/SIRET** via API INSEE Sirene → cohérence raison sociale + **code NAF vs secteur déclaré**.
+   - Vérification email pro (domaine ≠ fournisseurs grand public), MX, lien de confirmation.
+   - Anti-doublon / liste de blocage.
+2. **Revue humaine** dans le back-office Erpium : le validateur voit le dossier + les signaux automatiques,
+   puis **Approuve / Rejette / Demande un complément** avec motif tracé (audit log).
+3. **À l'approbation** : provisioning automatique du **tenant**, invitation du client, attribution du numéro,
+   assistant de configuration de l'agent.
+
+> Tant que le compte n'est pas `APPROVED`, aucun numéro n'est attribué et l'API métier reste inaccessible
+> (l'utilisateur ne voit qu'un écran « dossier en cours d'examen »).
+
+---
+
+## 7 ter. Structure globale du SaaS
+
+### Découpage en services (modulaire, déployable en monolithe modulaire au début)
+
+```mermaid
+flowchart TB
+    subgraph Clients["Interfaces"]
+        LP[Site + Formulaire prospect]
+        DASH[Dashboard client]
+        BO[Back-office Erpium<br/>validation KYB + supervision]
+    end
+
+    subgraph Edge["Passerelle"]
+        GW[API Gateway<br/>auth, rate-limit, routage]
+    end
+
+    subgraph Services["Services applicatifs"]
+        IDN[Identity & Tenants<br/>auth, rôles, invitations]
+        ONB[Onboarding & KYB<br/>formulaire, vérif SIREN, workflow validation]
+        AGT[Agent Config<br/>prompt, voix, horaires, KB]
+        VOICE[Voice Runtime<br/>pipeline temps réel]
+        TELE[Telephony<br/>numéros, routage d'appels]
+        BIZ[Business Logic<br/>commandes, RDV, suivi]
+        INTG[Integrations Hub<br/>CRM, agenda, POS]
+        BILL[Billing & Usage<br/>quotas, facturation]
+        NOTIF[Notifications<br/>SMS, email, webhooks]
+        ANALYTICS[Analytics & Reporting]
+    end
+
+    subgraph DataStores["Données"]
+        PG[(PostgreSQL + RLS)]
+        REDIS[(Redis)]
+        S3[(Object Storage UE)]
+        VDB[(pgvector)]
+        VAULT[(Secrets / KMS)]
+    end
+
+    LP --> GW
+    DASH --> GW
+    BO --> GW
+    GW --> IDN & ONB & AGT & BIZ & BILL & ANALYTICS
+    TELE --> VOICE --> AGT
+    VOICE --> BIZ --> INTG
+    BIZ --> NOTIF
+    ONB --> IDN
+    Services --- DataStores
+    INTG --- VAULT
+```
+
+### Modules & responsabilités
+
+| Module | Rôle | Accès |
+|---|---|---|
+| **Identity & Tenants** | Auth (OIDC/MFA), rôles (owner/agent/admin Erpium), isolation tenant | Tous |
+| **Onboarding & KYB** | Formulaire prospect, vérif SIREN/NAF, machine à états, décision humaine | Prospect + Back-office |
+| **Agent Config** | Prompt système, voix, ton, horaires, règles d'escalade, base de connaissance | Client + Erpium |
+| **Telephony** | Achat/portage de numéros, mapping numéro → tenant, routage entrant | Système |
+| **Voice Runtime** | Pipeline STT→LLM→TTS, tour de parole, barge-in, escalade | Système |
+| **Business Logic** | Commandes, RDV, suivi, exécution des tools, confirmations | Système + Client |
+| **Integrations Hub** | Connecteurs CRM/agenda/POS, secrets par tenant, retries, circuit breaker | Système |
+| **Billing & Usage** | Compteur d'appels/minutes, quotas, plans, facturation | Client + Erpium |
+| **Notifications** | SMS/email transactionnels, webhooks sortants | Système |
+| **Analytics** | Historique d'appels, KPI, coût/appel, exports | Client + Erpium |
+
+### Trois surfaces d'interface
+
+1. **Site public + formulaire prospect** — entrée du tunnel, aucune donnée métier accessible.
+2. **Dashboard client** — visible uniquement après `APPROVED` : config agent, appels, commandes/RDV, intégrations, facturation.
+3. **Back-office Erpium (admin)** — file de validation KYB, supervision temps réel des appels, gestion des tenants, feature flags, facturation.
+
+### Arborescence de dépôt (monorepo suggéré)
+
+```text
+erpium/
+├── apps/
+│   ├── web-public/          # Site + formulaire prospect (Next.js)
+│   ├── web-dashboard/       # Dashboard client (Next.js)
+│   └── web-backoffice/      # Back-office Erpium / validation KYB (Next.js)
+├── services/
+│   ├── api/                 # API applicative (FastAPI) : identity, onboarding, agent, billing…
+│   ├── voice-runtime/       # Pipeline vocal temps réel (Pipecat) + workers
+│   ├── integrations/        # Connecteurs (CRM, agenda, POS) + interfaces abstraites
+│   └── workers/             # Jobs async : sync CRM, notifications, purge RGPD
+├── packages/
+│   ├── shared-types/        # Schémas/DTO partagés (tenant, call, order, kyb…)
+│   ├── db/                  # Modèles, migrations, politiques RLS
+│   └── config/              # Config partagée, feature flags
+├── infra/
+│   ├── docker/              # Dockerfiles, docker-compose (dev)
+│   ├── k8s/                 # Manifests (scale)
+│   └── terraform/           # Provisioning cloud UE
+└── docs/
+    └── ARCHITECTURE.md
+```
+
+> **Démarrage pragmatique** : un **monolithe modulaire** (services `api` + `voice-runtime` + `workers`)
+> déployés en conteneurs suffit pour les pilotes. Les modules ci-dessus sont des **frontières logiques**
+> qu'on extrait en services indépendants seulement quand la charge le justifie.
+
+---
+
 ## 8. Sécurité, conformité & RGPD (marché FR/UE)
 
 - **Hébergement UE** (Scaleway, OVHcloud, ou AWS/GCP région EU) — argument commercial fort.
